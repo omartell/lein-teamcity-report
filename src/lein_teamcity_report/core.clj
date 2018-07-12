@@ -59,34 +59,34 @@
       (.replaceAll "\\[" "|[")
       (.replaceAll "\\]" "|]")))
 
-(def original-test-report
-  clojure.test/report)
+(defn original-report [m]
+  (apply (::f m) [m]))
 
 (defmulti report :type)
 
 (defmethod report :default [m]
-  (original-test-report m))
+  (original-report m))
 
 (defmethod report :begin-test-ns [m]
   (println (str "##teamcity[testSuiteStarted name='" (ns-name (:ns m)) "']"))
-  (original-test-report m))
+  (original-report m))
 
 (defmethod report :end-test-ns [m]
-  (original-test-report m)
+  (original-report m)
   (println (str "##teamcity[testSuiteFinished name='" (ns-name (:ns m)) "']")))
 
 (defmethod report :begin-test-var [m]
   (println (str "##teamcity[testStarted name='" (test-name)  "' captureStandardOutput='true']"))
-  (original-test-report m))
+  (original-report m))
 
 (defmethod report :end-test-var [m]
-  (original-test-report m)
+  (original-report m)
   (println (str "##teamcity[testFinished name='" (test-name) "']")))
 
 (defmethod report :fail [m]
-  (original-test-report m)
+  (original-report m)
   (println (str "##teamcity[testFailed name='" (test-name) "' message='" (escape-fail-msg (fail-msg m)) "']")))
 
 (defmethod report :error [m]
-  (original-test-report m)
+  (original-report m)
   (println (str "##teamcity[testFailed name='" (test-name) "' message='" (escape-fail-msg (fail-msg m)) "']")))
